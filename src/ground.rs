@@ -1,5 +1,7 @@
 use bevy::prelude::*;
 
+use crate::SCALE;
+
 pub fn spawn_ground(
     mut commands: Commands,
     asset_server: Res<AssetServer>,
@@ -17,8 +19,8 @@ pub fn spawn_ground(
                 ..Default::default()
             },
             transform: Transform {
-                translation: Vec3::new(i as f32 * 24. * 3., -24. * 3. * 2., 0.),
-                scale: Vec3::new(3., 3., 0.),
+                translation: Vec3::new(i as f32 * 24. * SCALE as f32, -24. * SCALE as f32 * 2., 0.),
+                scale: Vec3::new(SCALE as f32, SCALE as f32, 0.),
                 ..Default::default()
             },
             ..Default::default()
@@ -33,8 +35,8 @@ pub fn spawn_ground(
                 ..Default::default()
             },
             transform: Transform {
-                translation: Vec3::new(-i as f32 * 24. * 3., -24. * 3. * 2., 0.),
-                scale: Vec3::new(3., 3., 0.),
+                translation: Vec3::new(-i as f32 * 24. * SCALE as f32, -24. * SCALE as f32 * 2., 0.),
+                scale: Vec3::new(SCALE as f32, SCALE as f32, 0.),
                 ..Default::default()
             },
             ..Default::default()

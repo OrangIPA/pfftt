@@ -1,7 +1,15 @@
 use bevy::prelude::*;
 
+use crate::SCALE;
+
 #[derive(Component)]
 pub struct Player;
+
+#[derive(Component, Deref, DerefMut)]
+pub struct Velocity(f32);
+
+#[derive(Component, Deref, DerefMut)]
+pub struct Acceleration(f32);
 
 pub fn spawn_player(
     mut commands: Commands,
@@ -16,17 +24,21 @@ pub fn spawn_player(
     commands.spawn_bundle(SpriteSheetBundle {
         texture_atlas: texture_atlas_handle,
         transform: Transform {
-            translation: Vec3::new(0., -24. * 3., 0.),
-            scale: Vec3::new(3., 3., 0.),
+            translation: Vec3::new(0., -24. * SCALE as f32, 0.),
+            scale: Vec3::new(SCALE as f32, SCALE as f32, 0.),
             ..Default::default()
         },
         ..Default::default()
     })
-    .insert(Player);
+    .insert(Player)
+    .insert(Velocity(0.))
+    .insert(Acceleration(0.));
 }
 pub fn player_movement(
-    mut query: Query<&mut Transform, With<Player>>,
+    mut query: Query<(&mut Velocity, &mut Acceleration), With<Player>>,
     input: Res<Input<KeyCode>>,
 ) {
+    if input.pressed(KeyCode::D) {
 
+    }
 }

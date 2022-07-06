@@ -6,6 +6,8 @@ use bevy::prelude::*;
 use player::*;
 use ground::*;
 
+pub const SCALE: i32 = 3;
+
 pub struct PffttPlugins;
 
 impl Plugin for PffttPlugins {
