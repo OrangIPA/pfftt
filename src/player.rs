@@ -24,8 +24,8 @@ pub fn spawn_player(
     commands.spawn_bundle(SpriteSheetBundle {
         texture_atlas: texture_atlas_handle,
         transform: Transform {
-            translation: Vec3::new(0., -24. * SCALE as f32, 0.),
-            scale: Vec3::new(SCALE as f32, SCALE as f32, 0.),
+            translation: Vec3::new(0., -24. * SCALE, 0.),
+            scale: Vec3::new(SCALE, SCALE, 0.),
             ..Default::default()
         },
         ..Default::default()

@@ -19,8 +19,8 @@ pub fn spawn_ground(
                 ..Default::default()
             },
             transform: Transform {
-                translation: Vec3::new(i as f32 * 24. * SCALE as f32, -24. * SCALE as f32 * 2., 0.),
-                scale: Vec3::new(SCALE as f32, SCALE as f32, 0.),
+                translation: Vec3::new(i as f32 * 24. * SCALE, -24. * SCALE * 2., 0.),
+                scale: Vec3::new(SCALE as f32, SCALE, 0.),
                 ..Default::default()
             },
             ..Default::default()
@@ -35,8 +35,8 @@ pub fn spawn_ground(
                 ..Default::default()
             },
             transform: Transform {
-                translation: Vec3::new(-i as f32 * 24. * SCALE as f32, -24. * SCALE as f32 * 2., 0.),
-                scale: Vec3::new(SCALE as f32, SCALE as f32, 0.),
+                translation: Vec3::new(-i as f32 * 24. * SCALE, -24. * SCALE * 2., 0.),
+                scale: Vec3::new(SCALE, SCALE, 0.),
                 ..Default::default()
             },
             ..Default::default()
