@@ -14,7 +14,9 @@ impl Plugin for PffttPlugins {
     fn build(&self, app: &mut App) {
         app.add_startup_system(setup)
             .add_startup_system(spawn_player)
-            .add_startup_system(spawn_ground);
+            .add_startup_system(spawn_ground)
+            .add_system(player_input)
+            .add_system(player_update);
     }
 }
 
