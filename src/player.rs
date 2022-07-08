@@ -2,9 +2,24 @@ use bevy::prelude::*;
 
 use crate::SCALE;
 
+use std::cmp::Ordering;
+
+// use Direction::*;
+
 const MAX_SPEED: f32 = 350.;
 const ACCELERATION: f32 = 60.;
-const DECELERATION: f32 = 70.;
+const DECELERATION: f32 = 100.;
+
+#[derive(PartialEq)]
+enum Direction {
+    Positive, Negative, None
+}
+
+impl Default for Direction {
+    fn default() -> Self {
+        Direction::None
+    }
+}
 
 #[derive(Component)]
 pub struct Player;
@@ -13,10 +28,17 @@ pub struct Player;
 pub struct AnimationTimer(Timer);
 
 #[derive(Component)]
-pub struct Velocity(f32, f32);
+pub struct PlayerMovement {
+    vel: Vec2,
+    acc: Vec2,
+    dir: Direction,
+}
 
-#[derive(Component)]
-pub struct Acceleration(f32, f32);
+impl Default for PlayerMovement {
+    fn default() -> Self {
+        Self { vel: Default::default(), acc: Default::default(), dir: Default::default() }
+    }
+}
 
 pub fn spawn_player(
     mut commands: Commands,
@@ -42,60 +64,50 @@ pub fn spawn_player(
         ..Default::default()
     })
     .insert(Player)
-    .insert(Velocity(0., 0.))
-    .insert(Acceleration(0., 0.));
+    .insert(PlayerMovement {
+        ..Default::default()
+    });
 }
 pub fn player_input(
-    mut query: Query<(&mut Acceleration, &mut Velocity), With<Player>>,
+    mut query: Query<&mut PlayerMovement, With<Player>>,
     input: Res<Input<KeyCode>>,
 ) {
-    for (mut acc, mut vel) in query.iter_mut() {
-        // Decelerate player if neither 'a' or 'd' is pressed
-        if !input.pressed(KeyCode::D) && !input.pressed(KeyCode::A) {
-
-            // Decelerate player if moving to the right
-            if vel.0 > 0. {
-                vel.0 = -DECELERATION;
-                if vel.0 < 0. {
-                    vel.0 = 0.;
-                    acc.0 = 0.;
-                }
-                continue;
-            }
-            
-            // Decelerate player if moving to the left 
-            if vel.0 < 0. {
-                vel.0 = DECELERATION;
-                if vel.0 > 0. {
-                    vel.0 = 0.;
-                    acc.0 = 0.;
-                }
-                continue;
-            }
-        }
-
-        // Accelerate player to the right if 'D' key is pressed
+    for mut mov in query.iter_mut() {
+        mov.dir = Direction::None;
         if input.pressed(KeyCode::D) && !input.pressed(KeyCode::A) {
-            acc.0 = ACCELERATION;
+            mov.dir = Direction::Positive;
         }
 
-        // Accelerate player to the left if 'a' key is pressed
-        if input.pressed(KeyCode::A) {
-            acc.0 = -ACCELERATION;
+        if input.pressed(KeyCode::A) && !input.pressed(KeyCode::D){
+            mov.dir = Direction::Negative;
         }
     }
+
 }
 
 pub fn player_update(
-    mut query: Query<(&Acceleration, &mut Velocity, &mut Transform), With<Player>>,
+    mut query: Query<(&mut PlayerMovement, &mut Transform), With<Player>>,
     time: Res<Time>,
 ) {
-    for (acc, mut vel, mut transform) in query.iter_mut() {
-        vel.0 += acc.0;
+    for (mut mov, mut transform) in query.iter_mut() {
+        // Set the acceleration from dir
+        match mov.dir {
+            Direction::Positive => mov.acc.x = ACCELERATION,
+            Direction::Negative => mov.acc.x = -ACCELERATION,
+            Direction::None => mov.acc.x = 0.,
+        }
+        
+        // Deceleration
+        if (mov.dir == Direction::None) && (mov.acc.x != 0.) {
+            if mov.vel.x > 0. {
+                
+            }
+        }
 
-        if vel.0 > MAX_SPEED { vel.0 = MAX_SPEED; }
-        if vel.0 < -MAX_SPEED { vel.0 = -MAX_SPEED; }
+        // Update the velocity from acceleration
+        mov.vel.x += mov.acc.x;
 
-        transform.translation.x += vel.0 * time.delta_seconds();
+        // Update the position from velocity
+        transform.translation.x += mov.vel.x * time.delta_seconds();
     }
 }
