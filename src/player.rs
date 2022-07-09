@@ -2,13 +2,9 @@ use bevy::prelude::*;
 
 use crate::SCALE;
 
-use std::cmp::Ordering;
-
-// use Direction::*;
-
-const MAX_SPEED: f32 = 350.;
-const ACCELERATION: f32 = 60.;
-const DECELERATION: f32 = 100.;
+const MAX_SPEED: f32 = 550.;
+const ACCELERATION: f32 = 100.;
+const DECELERATION: f32 = 180.;
 
 #[derive(PartialEq)]
 enum Direction {
@@ -94,14 +90,34 @@ pub fn player_update(
         match mov.dir {
             Direction::Positive => mov.acc.x = ACCELERATION,
             Direction::Negative => mov.acc.x = -ACCELERATION,
-            Direction::None => mov.acc.x = 0.,
+            Direction::None => (),
         }
         
         // Deceleration
-        if (mov.dir == Direction::None) && (mov.acc.x != 0.) {
-            if mov.vel.x > 0. {
-                
+        if mov.dir == Direction::None {
+            if mov.vel.x < 0. {
+                mov.acc.x = DECELERATION;
+                if DECELERATION < mov.vel.x {
+                    mov.vel.x = 0.;
+                    mov.acc.x = 0.;
+                }
             }
+            
+            if mov.vel.x > 0. {
+                mov.acc.x = -DECELERATION;
+                if DECELERATION > mov.vel.x {
+                    mov.vel.x = 0.;
+                    mov.acc.x = 0.;
+                }
+            }
+        }
+
+        // Speed Limit
+        if mov.vel.x > MAX_SPEED {
+            mov.vel.x = MAX_SPEED;
+        }
+        if mov.vel.x < -MAX_SPEED {
+            mov.vel.x = -MAX_SPEED;
         }
 
         // Update the velocity from acceleration
