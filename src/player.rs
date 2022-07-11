@@ -2,9 +2,9 @@ use bevy::prelude::*;
 
 use crate::SCALE;
 
-const MAX_SPEED: f32 = 550.;
+const MAX_SPEED: f32 = 200.;
 const ACCELERATION: f32 = 100.;
-const DECELERATION: f32 = 180.;
+const DECELERATION: f32 = 160.;
 
 #[derive(PartialEq)]
 enum Direction {
@@ -20,7 +20,7 @@ impl Default for Direction {
 #[derive(Component)]
 pub struct Player;
 
-#[derive(Component)]
+#[derive(Component, Deref, DerefMut)]
 pub struct AnimationTimer(Timer);
 
 #[derive(Component)]
@@ -62,7 +62,8 @@ pub fn spawn_player(
     .insert(Player)
     .insert(PlayerMovement {
         ..Default::default()
-    });
+    })
+    .insert(AnimationTimer(Timer::from_seconds(0.1, true)));
 }
 pub fn player_input(
     mut query: Query<&mut PlayerMovement, With<Player>>,
@@ -124,6 +125,37 @@ pub fn player_update(
         mov.vel.x += mov.acc.x;
 
         // Update the position from velocity
-        transform.translation.x += mov.vel.x * time.delta_seconds();
+        transform.translation.x += mov.vel.x * time.delta_seconds() * SCALE;
+    }
+}
+
+pub fn animate_player(
+    time: Res<Time>,
+    texture_atlases: Res<Assets<TextureAtlas>>,
+    mut animation_query: Query<(
+        &mut AnimationTimer,
+        &mut TextureAtlasSprite,
+        &Handle<TextureAtlas>,
+    ), With<Player>>,
+    velocity_query: Query<&PlayerMovement, With<Player>>,
+    mut transform_query: Query<&mut Transform, With<Player>>,
+) {
+    let mut transform = transform_query.single_mut();
+    let vel = velocity_query.single().vel.x;
+    // if vel == 0. { return; }
+    if vel < 0. {
+        transform.scale.x = -SCALE;
+    } else {
+        transform.scale.x = SCALE;
+    }
+
+    for (mut timer, mut sprite, texture_atlas_handle) in animation_query.iter_mut() {
+        timer.tick(time.delta());
+        if timer.just_finished() {
+            let texture_atlas = texture_atlases.get(texture_atlas_handle).unwrap();
+            sprite.index = (sprite.index + 1) % texture_atlas.textures.len();
+            if sprite.index == 0 { sprite.index += 1; }
+            if vel == 0. { sprite.index = 0; }
+        }
     }
 }

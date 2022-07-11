@@ -6,7 +6,7 @@ use bevy::prelude::*;
 use player::*;
 use ground::*;
 
-pub const SCALE: f32 = 3.;
+pub const SCALE: f32 = 2.;
 
 pub struct PffttPlugins;
 
@@ -16,7 +16,8 @@ impl Plugin for PffttPlugins {
             .add_startup_system(spawn_player)
             .add_startup_system(spawn_ground)
             .add_system(player_input)
-            .add_system(player_update);
+            .add_system(player_update)
+            .add_system(animate_player);
     }
 }
 
