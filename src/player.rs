@@ -159,3 +159,13 @@ pub fn animate_player(
         }
     }
 }
+
+pub fn collision_player(
+    mut player_transform: Query<&mut Transform, With<Player>>,
+) {
+    for mut transform in player_transform.iter_mut() {
+        if transform.translation.x >= 300. {
+            transform.translation.x = 300.
+        }
+    }
+}

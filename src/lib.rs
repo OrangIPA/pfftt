@@ -17,7 +17,8 @@ impl Plugin for PffttPlugins {
             .add_startup_system(spawn_ground)
             .add_system(player_input)
             .add_system(player_update)
-            .add_system(animate_player);
+            .add_system(animate_player)
+            .add_system(collision_player);
     }
 }
 
