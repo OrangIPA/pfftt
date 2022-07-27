@@ -18,12 +18,8 @@ impl Plugin for PffttPlugins {
             .add_system(player_input)
             .add_system(player_update)
             .add_system(animate_player)
-            .add_system(collision_player);
+            ;
     }
 }
 
-pub fn setup (
-
-) {
-
-}
+pub fn setup() {}
