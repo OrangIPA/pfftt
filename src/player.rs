@@ -7,7 +7,7 @@ use crate::SCALE;
 const MAX_SPEED: f32 = 150.;
 const ACCELERATION: f32 = 70.;
 const DECELERATION: f32 = 70.;
-const GRAVITY: f32 = -30.;
+const GRAVITY: f32 = -25.;
 const JUMP_SPEED: f32 = 350.;
 
 const PLAYER_SIZE: (f32, f32) = (18., 24.);
@@ -49,7 +49,6 @@ pub fn spawn_player(
     let texture_atlas = TextureAtlas::from_grid(texture_handle, Vec2::new(24.0, 24.0), 4, 1, None, None);
     let texture_atlas_handle = texture_atlases.add(texture_atlas);
 
-    commands.spawn(Camera2dBundle::default());
     commands
         .spawn(SpriteSheetBundle {
             texture_atlas: texture_atlas_handle,
@@ -213,5 +212,17 @@ pub fn animate_player(
                 sprite.index = 0;
             }
         }
+    }
+}
+
+pub fn fall_to_the_void(
+    mut player: Query<(&mut Transform, &mut PlayerMovement), With<Player>>,
+    input: Res<Input<KeyCode>>
+) {
+    let (mut trans, mut mov) = player.single_mut();
+    if trans.translation.y < -100. * SCALE || (input.just_pressed(KeyCode::R)){
+        trans.translation.y = -24. * SCALE;
+        trans.translation.x = -24. * SCALE;
+        mov.vel = Vec2::new(0., 0.);
     }
 }

@@ -1,10 +1,12 @@
 mod player;
 mod ground;
+mod camera;
 
 use bevy::prelude::*;
 
 use player::*;
 use ground::*;
+use camera::follow_player;
 
 pub const SCALE: f32 = 3.;
 
@@ -18,8 +20,15 @@ impl Plugin for PffttPlugins {
             .add_system(player_input)
             .add_system(player_update)
             .add_system(animate_player)
+            .add_system(follow_player)
+            .add_system(fall_to_the_void)
             ;
     }
 }
 
-pub fn setup() {}
+pub fn setup(
+    mut commands: Commands,
+) {
+    commands.spawn(Camera2dBundle::default())
+        .insert(camera::Camera);
+}
