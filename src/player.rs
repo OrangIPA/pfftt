@@ -4,11 +4,11 @@ use bevy::sprite::collide_aabb::{collide, Collision};
 use crate::ground::*;
 use crate::SCALE;
 
-const MAX_SPEED: f32 = 170.;
+const MAX_SPEED: f32 = 150.;
 const ACCELERATION: f32 = 70.;
-const DECELERATION: f32 = 80.;
-const GRAVITY: f32 = -20.;
-const JUMP_SPEED: f32 = 300.;
+const DECELERATION: f32 = 70.;
+const GRAVITY: f32 = -30.;
+const JUMP_SPEED: f32 = 350.;
 
 const PLAYER_SIZE: (f32, f32) = (18., 24.);
 
@@ -46,12 +46,12 @@ pub fn spawn_player(
     mut texture_atlases: ResMut<Assets<TextureAtlas>>,
 ) {
     let texture_handle = asset_server.load("player.png");
-    let texture_atlas = TextureAtlas::from_grid(texture_handle, Vec2::new(24.0, 24.0), 4, 1);
+    let texture_atlas = TextureAtlas::from_grid(texture_handle, Vec2::new(24.0, 24.0), 4, 1, None, None);
     let texture_atlas_handle = texture_atlases.add(texture_atlas);
 
-    commands.spawn_bundle(OrthographicCameraBundle::new_2d());
+    commands.spawn(Camera2dBundle::default());
     commands
-        .spawn_bundle(SpriteSheetBundle {
+        .spawn(SpriteSheetBundle {
             texture_atlas: texture_atlas_handle,
             transform: Transform {
                 translation: Vec3::new(0., -24. * SCALE, 0.),
@@ -69,7 +69,7 @@ pub fn spawn_player(
             acc: Vec2::new(0., GRAVITY),
             ..Default::default()
         })
-        .insert(AnimationTimer(Timer::from_seconds(0.1, true)));
+        .insert(AnimationTimer(Timer::from_seconds(0.1, TimerMode::Repeating)));
 }
 
 pub fn player_input(
@@ -143,6 +143,7 @@ pub fn player_update(
         player_transform.translation.x += mov.vel.x * time.delta_seconds() * SCALE;
         player_transform.translation.y += mov.vel.y * time.delta_seconds() * SCALE;
 
+        // Collision
         mov.touch_ground = false;
         for block_transform in block_transform.iter() {
             match collide(
@@ -157,7 +158,8 @@ pub fn player_update(
                 Some(Collision::Right) => {
                     player_transform.translation.x = block_transform.translation.x + PLAYER_SIZE.0 * SCALE;
                 },
-                Some(Collision::Top) => {
+                Some(Collision::Top)
+                if mov.vel.y < 0. => {
                     player_transform.translation.y = block_transform.translation.y + PLAYER_SIZE.1 * SCALE;
                     mov.vel.y = 0.;
                     mov.touch_ground = true;
