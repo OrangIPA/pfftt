@@ -5,6 +5,14 @@ use crate::SCALE;
 #[derive(Component)]
 pub struct Block;
 
+pub struct GroundPlugin;
+
+impl Plugin for GroundPlugin {
+    fn build(&self, app: &mut App) {
+        app.add_startup_system(spawn_ground);
+    }
+}
+
 pub fn spawn_ground(
     mut commands: Commands,
     asset_server: Res<AssetServer>,

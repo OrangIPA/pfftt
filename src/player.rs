@@ -12,6 +12,18 @@ const JUMP_SPEED: f32 = 350.;
 
 const PLAYER_SIZE: (f32, f32) = (18., 24.);
 
+pub struct PlayerPlugin;
+
+impl Plugin for PlayerPlugin {
+    fn build(&self, app: &mut App) {
+        app.add_startup_system(spawn_player)
+            .add_system(player_input)
+            .add_system(player_update)
+            .add_system(animate_player)
+            .add_system(fall_to_the_void);
+    }
+}
+
 #[derive(PartialEq)]
 enum Direction {
     Positive,
@@ -220,7 +232,7 @@ pub fn fall_to_the_void(
     input: Res<Input<KeyCode>>
 ) {
     let (mut trans, mut mov) = player.single_mut();
-    if trans.translation.y < -100. * SCALE || (input.just_pressed(KeyCode::R)){
+    if trans.translation.y < -100. * SCALE || input.just_pressed(KeyCode::R){
         trans.translation.y = -24. * SCALE;
         trans.translation.x = -24. * SCALE;
         mov.vel = Vec2::new(0., 0.);

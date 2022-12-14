@@ -1,6 +1,14 @@
 use bevy::prelude::*;
 use crate::player::Player;
 
+pub struct CameraPlugin;
+
+impl Plugin for CameraPlugin {
+    fn build(&self, app: &mut App) {
+        app.add_system(follow_player);
+    }
+}
+
 #[derive(Component)]
 pub struct Camera;
 

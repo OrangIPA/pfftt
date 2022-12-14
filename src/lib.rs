@@ -2,27 +2,22 @@ mod player;
 mod ground;
 mod camera;
 
-use bevy::prelude::*;
+use bevy::{prelude::*, app::PluginGroupBuilder};
 
-use player::*;
-use ground::*;
-use camera::follow_player;
+use player::PlayerPlugin;
+use ground::GroundPlugin;
+use camera::CameraPlugin;
 
 pub const SCALE: f32 = 3.;
 
 pub struct PffttPlugins;
 
-impl Plugin for PffttPlugins {
-    fn build(&self, app: &mut App) {
-        app.add_startup_system(setup)
-            .add_startup_system(spawn_player)
-            .add_startup_system(spawn_ground)
-            .add_system(player_input)
-            .add_system(player_update)
-            .add_system(animate_player)
-            .add_system(follow_player)
-            .add_system(fall_to_the_void)
-            ;
+impl PluginGroup for PffttPlugins {
+    fn build(self) -> bevy::app::PluginGroupBuilder {
+        PluginGroupBuilder::start::<Self>()
+            .add(PlayerPlugin)
+            .add(CameraPlugin)
+            .add(GroundPlugin)
     }
 }
 
