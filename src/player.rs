@@ -3,12 +3,13 @@ use bevy::sprite::collide_aabb::{collide, Collision};
 
 use crate::ground::*;
 use crate::SCALE;
+use crate::level::{PlayerSpawned, SpawnPosition};
 
 const MAX_SPEED: f32 = 150.;
-const ACCELERATION: f32 = 70.;
-const DECELERATION: f32 = 70.;
-pub const GRAVITY: f32 = -25.;
-const JUMP_SPEED: f32 = 350.;
+const ACCELERATION: f32 = 1700.;
+const DECELERATION: f32 = 2000.;
+const GRAVITY: f32 = -700.;
+const JUMP_SPEED: f32 = 200.;
 
 const PLAYER_SIZE: (f32, f32) = (18., 24.);
 
@@ -25,7 +26,7 @@ impl Plugin for PlayerPlugin {
 }
 
 #[derive(PartialEq)]
-pub enum Direction {
+enum Direction {
     Positive,
     Negative,
     None,
@@ -41,15 +42,15 @@ impl Default for Direction {
 pub struct Player;
 
 #[derive(Component, Deref, DerefMut)]
-pub struct AnimationTimer(pub Timer);
+pub struct AnimationTimer(Timer);
 
 #[derive(Component, Default)]
 pub struct PlayerMovement {
-    pub vel: Vec2,
-    pub acc: Vec2,
-    pub dir: Direction,
-    pub touch_ground: bool,
-    pub double_jump: bool,
+    vel: Vec2,
+    acc: Vec2,
+    dir: Direction,
+    touch_ground: bool,
+    double_jump: bool,
 }
 
 pub fn spawn_player(
@@ -109,6 +110,8 @@ pub fn player_update(
     mut query: Query<(&mut PlayerMovement, &mut Transform), With<Player>>,
     block_transform: Query<&Transform, (With<Block>, Without<Player>)>,
     time: Res<Time>,
+    mut player_spawned: ResMut<PlayerSpawned>,
+    spawn_pos: Res<SpawnPosition>,
 ) {
     for (mut mov, mut player_transform) in query.iter_mut() {
 
@@ -147,8 +150,8 @@ pub fn player_update(
         }
 
         // Update the velocity from acceleration
-        mov.vel.x += mov.acc.x;
-        mov.vel.y += mov.acc.y;
+        mov.vel.x += mov.acc.x * time.delta_seconds();
+        mov.vel.y += mov.acc.y * time.delta_seconds();
 
         // Update the position from velocity
         player_transform.translation.x += mov.vel.x * time.delta_seconds() * SCALE;
@@ -181,6 +184,14 @@ pub fn player_update(
                     mov.vel.y = 0.;
                 },
                 _ => (),
+            }
+        }
+        if **player_spawned {continue;}
+        match **spawn_pos {
+            None => continue,
+            Some(v) => {
+                player_transform.translation = Vec3::new(v.x * 24. * SCALE, v.y * 24. * SCALE, 0.);
+                **player_spawned = true;
             }
         }
     }
@@ -228,13 +239,13 @@ pub fn animate_player(
 }
 
 pub fn fall_to_the_void(
-    mut player: Query<(&mut Transform, &mut PlayerMovement), With<Player>>,
-    input: Res<Input<KeyCode>>
+    player: Query<(&mut Transform, &mut PlayerMovement), With<Player>>,
+    input: Res<Input<KeyCode>>,
+    mut player_spawned: ResMut<PlayerSpawned>,
+
 ) {
-    let (mut trans, mut mov) = player.single_mut();
+    let (trans, _mov) = player.single();
     if trans.translation.y < -100. * SCALE || input.just_pressed(KeyCode::R){
-        trans.translation.y = -24. * SCALE;
-        trans.translation.x = -24. * SCALE;
-        mov.vel = Vec2::new(0., 0.);
+        **player_spawned = false;
     }
 }

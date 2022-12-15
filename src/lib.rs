@@ -1,12 +1,13 @@
 mod player;
 mod ground;
 mod camera;
-mod level;
+pub mod level;
 
 use bevy::{prelude::*, app::PluginGroupBuilder};
 
+use level::LevelPlugin;
 use player::PlayerPlugin;
-use ground::GroundPlugin;
+// use ground::GroundPlugin;
 use camera::CameraPlugin;
 
 pub const SCALE: f32 = 3.;
@@ -18,7 +19,7 @@ impl PluginGroup for PffttPlugins {
         PluginGroupBuilder::start::<Self>()
             .add(PlayerPlugin)
             .add(CameraPlugin)
-            .add(GroundPlugin)
+            .add(LevelPlugin)
     }
 }
 
