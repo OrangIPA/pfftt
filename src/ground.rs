@@ -22,7 +22,7 @@ pub fn spawn_ground(
     let texture_atlas = TextureAtlas::from_grid(texture_handle, Vec2::new(24., 24.), 4, 4, None, None);
     let texture_atlas_handle = texture_atlases.add(texture_atlas);
 
-    for i in 0..11 {
+    for i in 0..100 {
         commands
             .spawn(SpriteSheetBundle {
                 texture_atlas: texture_atlas_handle.clone(),

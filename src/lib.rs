@@ -1,6 +1,7 @@
 mod player;
 mod ground;
 mod camera;
+mod level;
 
 use bevy::{prelude::*, app::PluginGroupBuilder};
 

@@ -7,7 +7,7 @@ use crate::SCALE;
 const MAX_SPEED: f32 = 150.;
 const ACCELERATION: f32 = 70.;
 const DECELERATION: f32 = 70.;
-const GRAVITY: f32 = -25.;
+pub const GRAVITY: f32 = -25.;
 const JUMP_SPEED: f32 = 350.;
 
 const PLAYER_SIZE: (f32, f32) = (18., 24.);
@@ -25,7 +25,7 @@ impl Plugin for PlayerPlugin {
 }
 
 #[derive(PartialEq)]
-enum Direction {
+pub enum Direction {
     Positive,
     Negative,
     None,
@@ -41,15 +41,15 @@ impl Default for Direction {
 pub struct Player;
 
 #[derive(Component, Deref, DerefMut)]
-pub struct AnimationTimer(Timer);
+pub struct AnimationTimer(pub Timer);
 
 #[derive(Component, Default)]
 pub struct PlayerMovement {
-    vel: Vec2,
-    acc: Vec2,
-    dir: Direction,
-    touch_ground: bool,
-    double_jump: bool,
+    pub vel: Vec2,
+    pub acc: Vec2,
+    pub dir: Direction,
+    pub touch_ground: bool,
+    pub double_jump: bool,
 }
 
 pub fn spawn_player(
